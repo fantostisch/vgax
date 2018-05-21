@@ -34,9 +34,14 @@ li {
 }
 </style>
 <script>
-var ufont_image;
-
 function generate() {
+    let out = getArray(false);
+    out += "\n";
+    out += getArray(true);
+    $('#out').text(out);
+}
+var ufont_image;
+function getArray(mask) {
     if (!ufont_image) {
         alert("source image not valid");
         return;
@@ -74,31 +79,40 @@ function generate() {
             var r = data[idx + 0];
             var g = data[idx + 1];
             var b = data[idx + 2];
+            var a = data[idx + 3];
             var pixel=0;
-            switch ($('#colorcomb').val()) {
-            case 'RG':
-                if (r>127 && g>127)
-                    pixel=3;
-                else if (r>127)
-                    pixel=2;
-                else if (g>127)
-                    pixel=1;
-                else
-                    pixel=0;
-                break;
-            case 'GR':
-                if (r>127 && g>127)
-                    pixel=3;
-                else if (g>127)
-                    pixel=2;
-                else if (r>127)
-                    pixel=1;
-                else
-                    pixel=0;
-                break;
-            default:
-                alert("unsupported colour combination");
-                return;
+            if(mask) {
+                if(a > 0.5) {
+                    pixel = 0;
+                } else {
+                    pixel = 3;
+                }
+            } else {
+                switch ($('#colorcomb').val()) {
+                    case 'RG':
+                        if (r > 127 && g > 127)
+                            pixel = 3;
+                        else if (r > 127)
+                            pixel = 2;
+                        else if (g > 127)
+                            pixel = 1;
+                        else
+                            pixel = 0;
+                        break;
+                    case 'GR':
+                        if (r > 127 && g > 127)
+                            pixel = 3;
+                        else if (g > 127)
+                            pixel = 2;
+                        else if (r > 127)
+                            pixel = 1;
+                        else
+                            pixel = 0;
+                        break;
+                    default:
+                        alert("unsupported colour combination");
+                        return;
+                }
             }
             outpixel|=pixel<<pshift;
             pshift-=2;
@@ -149,6 +163,9 @@ function generate() {
         ostring+="}\n";
 
     var imagename=$('#vname').val();
+    if(mask) {
+        imagename += "mask";
+    }
     var header="//image generated from 2BITIMAGE - by Sandro Maffiodo\n"+
         "#define IMG_"+imagename.toUpperCase()+"_WIDTH "+cdata.width+"\n"+
         "#define IMG_"+imagename.toUpperCase()+"_BWIDTH "+Math.ceil(cdata.width/4)+"\n"+
@@ -157,7 +174,7 @@ function generate() {
         "//data size="+(Math.ceil(cdata.width/4)*cdata.height)+" bytes\n"+
         "const unsigned char img_"+imagename+"_data"+(multisprite ? ("[IMG_"+imagename.toUpperCase()+"_SPRITES_CNT]") : "")+"[IMG_"+imagename.toUpperCase()+"_HEIGHT][IMG_"+imagename.toUpperCase()+"_BWIDTH] PROGMEM={\n";
     var footer="};\n";
-    $('#out').text(header+ostring+footer);
+    return header+ostring+footer;
 }
 function boot() {
     $('#f').on('change', function(ev) {
