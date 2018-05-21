@@ -166,8 +166,7 @@ function getArray(mask) {
     if(mask) {
         imagename += "mask";
     }
-    var header="//image generated from 2BITIMAGE - by Sandro Maffiodo\n"+
-        "#define IMG_"+imagename.toUpperCase()+"_WIDTH "+cdata.width+"\n"+
+    var header="#define IMG_"+imagename.toUpperCase()+"_WIDTH "+cdata.width+"\n"+
         "#define IMG_"+imagename.toUpperCase()+"_BWIDTH "+Math.ceil(cdata.width/4)+"\n"+
         "#define IMG_"+imagename.toUpperCase()+"_HEIGHT "+(multisprite ? sh : cdata.height)+"\n"+
         (multisprite ? "#define IMG_"+imagename.toUpperCase()+"_SPRITES_CNT "+spritescount+"\n" : "")+
